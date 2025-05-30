@@ -5,18 +5,17 @@ import torch.nn as nn
 import os
 import pandas as pd
 
-def evaluate(model, data_loader, device):
+def evaluate(model, data_loader, device, cce):
     model.eval()
     correct = 0
     total = 0
     running_loss = 0.0
-    criterion = nn.CrossEntropyLoss()
 
     with torch.no_grad():
         for inputs, labels in data_loader:
             inputs, labels = inputs.to(device), labels.to(device)
             outputs = model(inputs)
-            loss = criterion(outputs, labels)
+            loss = cce(outputs, labels)
             running_loss += loss.item()
 
             _, predicted = torch.max(outputs, 1)
