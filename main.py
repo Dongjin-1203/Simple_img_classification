@@ -8,7 +8,7 @@ import torch.optim as optim
 from module.data_set import data_split
 from module.model import Simple_CNN
 from module.train import train_model
-from module.utils import evaluate, test, save_result
+from module.utils import evaluate, test, save_result, plot_training
 
 if __name__ == "__main__":
     print("모듈을 성공적으로 불러왔습니다.")
@@ -52,7 +52,7 @@ if __name__ == "__main__":
 
     # 훈련 모델
     epoch = 8
-    train_model(model, cce, optimizer, train_loader, device, epoch)
+    train_model(model, cce, optimizer, train_loader, val_loader, device, epoch)
     
     # 모델 평가
     val_loss, val_acc = evaluate(model, val_loader, device, cce)

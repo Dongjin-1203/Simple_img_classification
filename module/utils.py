@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 import torch
@@ -57,3 +58,29 @@ def save_result(model, test_path, transform, device, epoch, output_dir=".", pref
 
     df.to_csv(output_path, index=False)
     print(f"예측 결과 저장 완료: {output_path}")
+
+
+def plot_training(train_losses, val_losses, val_accuracies):
+    epochs = range(1, len(train_losses)+1)
+
+    plt.figure(figsize=(12, 5))
+
+    # Loss 그래프
+    plt.subplot(1, 2, 1)
+    plt.plot(epochs, train_losses, label='Train Loss')
+    plt.plot(epochs, val_losses, label='Val Loss')
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.title("Loss over Epochs")
+    plt.legend()
+
+    # Accuracy 그래프
+    plt.subplot(1, 2, 2)
+    plt.plot(epochs, val_accuracies, label='Val Accuracy')
+    plt.xlabel("Epoch")
+    plt.ylabel("Accuracy (%)")
+    plt.title("Validation Accuracy over Epochs")
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
