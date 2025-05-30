@@ -8,7 +8,7 @@ import torch.optim as optim
 from module.data_set import data_split
 from module.model import Simple_CNN
 from module.train import train_model
-from module.utils import evaluate
+from module.utils import evaluate, test, save_result
 
 if __name__ == "__main__":
     print("모듈을 성공적으로 불러왔습니다.")
@@ -51,7 +51,14 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     # 훈련 모델
-    train_model(model, cce, optimizer, train_loader, device, num_epochs=10)
+    train_model(model, cce, optimizer, train_loader, device, num_epochs=3)
     
     # 모델 평가
     evaluate(model, val_loader, device)
+
+    # 테스트
+    test_path = 'data/seg_test/seg_test'
+    #test(model, test_path, transform, device)
+
+    # 결과 저장
+    save_result(model, test_path, transform, device, output_path="predictions.csv")

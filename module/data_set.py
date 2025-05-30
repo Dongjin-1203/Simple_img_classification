@@ -1,7 +1,6 @@
 from torch.utils.data import DataLoader
 import torch
 import matplotlib.pyplot as plt
-import numpy as np
 
 def data_split(data, class_names):
     # 훈련/검증 분리
