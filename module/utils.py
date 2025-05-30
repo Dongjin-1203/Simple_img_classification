@@ -41,12 +41,19 @@ def test(model, test_path, transform, device):
             predictions.extend(preds.cpu().numpy())
     return test_data, predictions
 
-def save_result(model, test_path, transform, device, output_path="predictions.csv"):
+def save_result(model, test_path, transform, device, epoch, output_dir=".", prefix="predictions"):
     # 필요 변수들
     test_data, predictions= test(model, test_path, transform, device)
 
     # 파일명과 예측 결과 매핑
     filenames = [os.path.basename(path[0]) for path in test_data.samples]
     df = pd.DataFrame({"filename": filenames, "predicted": predictions})
+    # 클래스 명으로 저장
+    idx_to_class = {v: k for k, v in test_data.class_to_idx.items()}
+    df["label"] = df["predicted"].map(idx_to_class)
+
+    output_filename = f"[Epoch_{epoch}]_{prefix}.csv"
+    output_path = os.path.join(output_dir, output_filename)
+
     df.to_csv(output_path, index=False)
     print(f"예측 결과 저장 완료: {output_path}")

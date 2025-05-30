@@ -39,7 +39,7 @@ if __name__ == "__main__":
     class_names = data.classes
 
     # 훈련/검증 데이터 분류 및 확인
-    train_loader, val_loader = data_split(data, class_names, visualize=True)
+    train_loader, val_loader = data_split(data, class_names, visualize=False)
 
     # 모델 선언
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -51,16 +51,13 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     # 훈련 모델
-    train_model(model, cce, optimizer, train_loader, device, num_epochs=3)
+    epoch = 8
+    train_model(model, cce, optimizer, train_loader, device, epoch)
     
     # 모델 평가
     val_loss, val_acc = evaluate(model, val_loader, device, cce)
     print(f"Validation Loss: {val_loss:.4f} | Accuracy: {val_acc:.2f}%")
 
-
-    # 테스트
-    test_path = 'data/seg_test/seg_test'
-    #test(model, test_path, transform, device)
-
     # 결과 저장
-    save_result(model, test_path, transform, device, output_path="predictions.csv")
+    test_path = 'data/seg_test/seg_test'
+    save_result(model, test_path, transform, device, epoch)
