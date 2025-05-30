@@ -12,4 +12,3 @@ module/__pycache__/
 *.db
 
 # 전처리 파일
-data/EDA/

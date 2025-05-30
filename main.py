@@ -1,10 +1,14 @@
 # 라이브러리 불러오기
 from torchvision import datasets, transforms
-from torch.utils.data import DataLoader
 import torch
+import torch.nn as nn
+import torch.optim as optim
 
 # 모듈 불러오기
 from module.data_set import data_split
+from module.model import Simple_CNN
+from module.train import train_model
+from module.utils import evaluate
 
 if __name__ == "__main__":
     print("모듈을 성공적으로 불러왔습니다.")
@@ -35,4 +39,19 @@ if __name__ == "__main__":
     class_names = data.classes
 
     # 훈련/검증 데이터 분류 및 확인
-    data_split(data, class_names)
+    train_loader, val_loader = data_split(data, class_names)
+
+    # 모델 선언
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    model = Simple_CNN().to(device)
+
+    # 손실함수, 옵티마이져 선언
+    cce = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+    # 훈련 모델
+    train_model(model, cce, optimizer, train_loader, device, num_epochs=10)
+    
+    # 모델 평가
+    evaluate(model, val_loader, device)

@@ -1,18 +1,7 @@
-from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 import torch
 import matplotlib.pyplot as plt
 import numpy as np
-
-# 이미지 전처리 정의
-transform = transforms.Compose([
-    transforms.Resize((150, 150)),
-    transforms.ToTensor(),
-])
-
-# ImageFolder로 불러오기
-path='data/seg_train/seg_train'
-data = datasets.ImageFolder(root=path, transform=transform)
 
 def data_split(data, class_names):
     # 훈련/검증 분리
