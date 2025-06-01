@@ -3,13 +3,13 @@ import matplotlib.pyplot as plt
 from module.utils import evaluate, plot_training, EarlyStopping
 
 
-def train_model(model, cce, optimizer, train_loader, val_loader, device, num_epochs=30):
+def train_model(model, cce, optimizer, train_loader, val_loader, device, epoch, scheduler):
     early_stopping = EarlyStopping(patience=5, save_path="best_model.pt")
     train_losses = []
     val_losses = []
     val_accuracies = []
 
-    for epoch in range(num_epochs):
+    for epoch in range(epoch):
         model.train()
         running_loss = 0.0
 
@@ -34,14 +34,15 @@ def train_model(model, cce, optimizer, train_loader, val_loader, device, num_epo
 
         print(f"[Epoch {epoch+1}] Train Loss: {avg_train_loss:.4f} | Val Loss: {val_loss:.4f} | Acc: {val_acc:.2f}%")
 
+        scheduler.step(val_loss)  # 매 epoch 끝에 호출
         early_stopping(val_loss, model)
 
         if early_stopping.early_stop:
             print("⛔ Early stopping triggered.")
             # 학습 그래프 저장
-            plot_training(train_losses, val_losses, val_accuracies, save_path="training_plot.png")
+            plot_training(train_losses, val_losses, val_accuracies, save_path="img/training_plot.png")
             break
 
     # 정상 종료 시도 그래프 저장
     if not early_stopping.early_stop:
-        plot_training(train_losses, val_losses, val_accuracies, save_path="training_plot.png")
+        plot_training(train_losses, val_losses, val_accuracies, save_path="img/training_plot.png")

@@ -3,6 +3,7 @@ from torchvision import datasets, transforms
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 # 모듈 불러오기
 from module.data_set import data_split
@@ -52,11 +53,13 @@ if __name__ == "__main__":
 
     # 손실함수, 옵티마이져 선언
     cce = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=3)
 
     # 훈련 모델
     epoch = 30
-    train_model(model, cce, optimizer, train_loader, val_loader, device, epoch)
+    train_model(model, cce, optimizer, train_loader, val_loader, device, epoch, scheduler)
     
     # 모델 평가
     val_loss, val_acc = evaluate(model, val_loader, device, cce)
