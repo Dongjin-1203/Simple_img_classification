@@ -1,3 +1,4 @@
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
@@ -5,6 +6,7 @@ import torch
 import torch.nn as nn
 import os
 import pandas as pd
+import numpy as np
 
 def evaluate(model, data_loader, device, cce):
     model.eval()
@@ -89,7 +91,7 @@ def plot_training(train_losses, val_losses, val_accuracies, save_path=None):
         print(f"📈 학습 그래프 저장 완료: {save_path}")
     plt.show()
 
-
+# 조기 종료
 class EarlyStopping:
     def __init__(self, patience=5, verbose=True, save_path="best_model.pt"):
         self.patience = patience
@@ -118,3 +120,30 @@ class EarlyStopping:
         torch.save(model.state_dict(), self.save_path)
         if self.verbose:
             print(f"✅ Best model saved to {self.save_path}")
+
+# 혼동 행렬
+def plot_confusion_matrix(model, data_loader, device, class_names, normalize='true', title="Confusion Matrix", save_path=None):
+    model.eval()
+    all_preds = []
+    all_labels = []
+
+    with torch.no_grad():
+        for inputs, labels in data_loader:
+            inputs = inputs.to(device)
+            outputs = model(inputs)
+            _, preds = torch.max(outputs, 1)
+
+            all_preds.extend(preds.cpu().numpy())
+            all_labels.extend(labels.numpy())
+
+    cm = confusion_matrix(all_labels, all_preds, normalize=normalize)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=class_names)
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+    disp.plot(ax=ax, cmap='Blues', values_format=".2f")
+    plt.title(title)
+
+    if save_path:
+        plt.savefig(save_path)
+        print(f"✅ Confusion Matrix 저장 완료: {save_path}")
+    plt.show()

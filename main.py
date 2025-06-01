@@ -8,7 +8,7 @@ import torch.optim as optim
 from module.data_set import data_split
 from module.model import Simple_CNN
 from module.train import train_model
-from module.utils import evaluate, test, save_result, plot_training
+from module.utils import evaluate, test, save_result, plot_training, plot_confusion_matrix
 
 if __name__ == "__main__":
     print("모듈을 성공적으로 불러왔습니다.")
@@ -61,3 +61,6 @@ if __name__ == "__main__":
     # 결과 저장
     test_path = 'data/seg_test/seg_test'
     save_result(model, test_path, transform, device, epoch)
+
+    # class_names는 ImageFolder로부터 추출된 클래스 리스트입니다.
+    plot_confusion_matrix(model, val_loader, device, class_names, save_path="confusion_matrix.png")
