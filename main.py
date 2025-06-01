@@ -51,7 +51,7 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     # 훈련 모델
-    epoch = 8
+    epoch = 30
     train_model(model, cce, optimizer, train_loader, val_loader, device, epoch)
     
     # 모델 평가

@@ -60,12 +60,13 @@ def save_result(model, test_path, transform, device, epoch, output_dir=".", pref
     print(f"예측 결과 저장 완료: {output_path}")
 
 
-def plot_training(train_losses, val_losses, val_accuracies):
-    epochs = range(1, len(train_losses)+1)
+def plot_training(train_losses, val_losses, val_accuracies, save_path=None):
+    import matplotlib.pyplot as plt
 
+    epochs = range(1, len(train_losses)+1)
     plt.figure(figsize=(12, 5))
 
-    # Loss 그래프
+    # 손실 그래프
     plt.subplot(1, 2, 1)
     plt.plot(epochs, train_losses, label='Train Loss')
     plt.plot(epochs, val_losses, label='Val Loss')
@@ -74,7 +75,7 @@ def plot_training(train_losses, val_losses, val_accuracies):
     plt.title("Loss over Epochs")
     plt.legend()
 
-    # Accuracy 그래프
+    # 정확도 그래프
     plt.subplot(1, 2, 2)
     plt.plot(epochs, val_accuracies, label='Val Accuracy')
     plt.xlabel("Epoch")
@@ -83,4 +84,37 @@ def plot_training(train_losses, val_losses, val_accuracies):
     plt.legend()
 
     plt.tight_layout()
+    if save_path:
+        plt.savefig(save_path)
+        print(f"📈 학습 그래프 저장 완료: {save_path}")
     plt.show()
+
+
+class EarlyStopping:
+    def __init__(self, patience=5, verbose=True, save_path="best_model.pt"):
+        self.patience = patience
+        self.verbose = verbose
+        self.counter = 0
+        self.best_loss = None
+        self.early_stop = False
+        self.save_path = save_path
+
+    def __call__(self, val_loss, model):
+        if self.best_loss is None:
+            self.best_loss = val_loss
+            self.save_checkpoint(model)
+        elif val_loss >= self.best_loss:
+            self.counter += 1
+            if self.verbose:
+                print(f"💤 EarlyStopping counter: {self.counter} / {self.patience}")
+            if self.counter >= self.patience:
+                self.early_stop = True
+        else:
+            self.best_loss = val_loss
+            self.save_checkpoint(model)
+            self.counter = 0
+
+    def save_checkpoint(self, model):
+        torch.save(model.state_dict(), self.save_path)
+        if self.verbose:
+            print(f"✅ Best model saved to {self.save_path}")

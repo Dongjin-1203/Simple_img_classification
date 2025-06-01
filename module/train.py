@@ -1,36 +1,47 @@
 import matplotlib.pyplot as plt
-from module.utils import evaluate, plot_training
 
-def train_model(model, cce, optimizer, train_loader, val_loader, device, epoch):
-        train_losses = []
-        val_losses = []
-        val_accuracies = []
-        # 학습 루프
-        for epoch in range(epoch):
-            model.train()
-            running_loss = 0.0
+from module.utils import evaluate, plot_training, EarlyStopping
 
-            for inputs, labels in train_loader:
-                inputs, labels = inputs.to(device), labels.to(device)
 
-                outputs = model(inputs)
-                loss = cce(outputs, labels)
+def train_model(model, cce, optimizer, train_loader, val_loader, device, num_epochs=30):
+    early_stopping = EarlyStopping(patience=5, save_path="best_model.pt")
+    train_losses = []
+    val_losses = []
+    val_accuracies = []
 
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
+    for epoch in range(num_epochs):
+        model.train()
+        running_loss = 0.0
 
-                running_loss += loss.item()
+        for inputs, labels in train_loader:
+            inputs, labels = inputs.to(device), labels.to(device)
 
-            avg_train_loss = running_loss / len(train_loader)
-            train_losses.append(avg_train_loss)
+            outputs = model(inputs)
+            loss = cce(outputs, labels)
 
-            # 검증
-            val_loss, val_acc = evaluate(model, val_loader, device, cce)
-            val_losses.append(val_loss)
-            val_accuracies.append(val_acc)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
-            print(f"[Epoch {epoch+1}] Train Loss: {avg_train_loss:.4f} | Val Loss: {val_loss:.4f} | Val Acc: {val_acc:.2f}%")
+            running_loss += loss.item()
 
-        # 훈련 종료 후 시각화
-        plot_training(train_losses, val_losses, val_accuracies)
+        avg_train_loss = running_loss / len(train_loader)
+        train_losses.append(avg_train_loss)
+
+        val_loss, val_acc = evaluate(model, val_loader, device, cce)
+        val_losses.append(val_loss)
+        val_accuracies.append(val_acc)
+
+        print(f"[Epoch {epoch+1}] Train Loss: {avg_train_loss:.4f} | Val Loss: {val_loss:.4f} | Acc: {val_acc:.2f}%")
+
+        early_stopping(val_loss, model)
+
+        if early_stopping.early_stop:
+            print("⛔ Early stopping triggered.")
+            # 학습 그래프 저장
+            plot_training(train_losses, val_losses, val_accuracies, save_path="training_plot.png")
+            break
+
+    # 정상 종료 시도 그래프 저장
+    if not early_stopping.early_stop:
+        plot_training(train_losses, val_losses, val_accuracies, save_path="training_plot.png")
