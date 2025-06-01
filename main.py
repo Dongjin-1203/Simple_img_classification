@@ -13,10 +13,14 @@ from module.utils import evaluate, test, save_result, plot_training, plot_confus
 if __name__ == "__main__":
     print("모듈을 성공적으로 불러왔습니다.")
     
-    # 이미지 전처리 정의
+    # 데이터 증강
     transform = transforms.Compose([
-        transforms.Resize((150, 150)),
-        transforms.ToTensor(),
+    #transforms.Resize((150, 150)),  #이미지를 픽셀단위로 resize(). RandomResizedCrop이 있으면 무의미
+    transforms.RandomHorizontalFlip(),  # 50%확률로 좌우 반전
+    transforms.RandomRotation(15),  # 이미지를 15도 사이 각도로 회전
+    transforms.RandomResizedCrop(150, scale=(0.7, 1.0)),    # 이미지에서 무작위로 일정영역을 잘라냄
+    transforms.ColorJitter(brightness=0.3, contrast=0.3),   # 이미지의 밝기, 대비를 무작위 조절. 조명, 날씨 조건 변화에 강인성 확보
+    transforms.ToTensor(),  # 텐서로 변환
     ])
 
     # ImageFolder로 불러오기

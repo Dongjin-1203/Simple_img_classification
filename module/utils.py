@@ -62,7 +62,7 @@ def save_result(model, test_path, transform, device, epoch, output_dir=".", pref
     print(f"예측 결과 저장 완료: {output_path}")
 
 
-def plot_training(train_losses, val_losses, val_accuracies, save_path=None):
+def plot_training(train_losses, val_losses, val_accuracies, save_path="img/"):
     import matplotlib.pyplot as plt
 
     epochs = range(1, len(train_losses)+1)
@@ -122,7 +122,7 @@ class EarlyStopping:
             print(f"✅ Best model saved to {self.save_path}")
 
 # 혼동 행렬
-def plot_confusion_matrix(model, data_loader, device, class_names, normalize='true', title="Confusion Matrix", save_path=None):
+def plot_confusion_matrix(model, data_loader, device, class_names, normalize='true', title="Confusion Matrix", save_path="img/"):
     model.eval()
     all_preds = []
     all_labels = []
