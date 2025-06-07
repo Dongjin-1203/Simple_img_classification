@@ -122,7 +122,7 @@ class EarlyStopping:
             print(f"✅ Best model saved to {self.save_path}")
 
 # 혼동 행렬
-def plot_confusion_matrix(model, data_loader, device, class_names, normalize='true', title="Confusion Matrix", save_path="img/"):
+def plot_confusion_matrix(model, data_loader, device, class_names, normalize='true', title="Confusion Matrix", save_path="img/confusion_matrix.png"):
     model.eval()
     all_preds = []
     all_labels = []

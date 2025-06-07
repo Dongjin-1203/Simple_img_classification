@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 from module.utils import evaluate, plot_training, EarlyStopping
 
 
-def train_model(model, cce, optimizer, train_loader, val_loader, device, epoch, scheduler):
-    early_stopping = EarlyStopping(patience=5, save_path="best_model.pt")
+def train_model(model, cce, optimizer, train_loader, val_loader, device, epoch, scheduler, save_path="best_model.pt"):
+    early_stopping = EarlyStopping(patience=5, save_path=save_path)
     train_losses = []
     val_losses = []
     val_accuracies = []
